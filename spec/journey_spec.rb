@@ -54,6 +54,20 @@ end
       journey.end_journey station2
       expect(journey.completed?).to be true
     end
-    
+
   end
+
+  describe '#this_journey' do
+
+    before do
+      journey.start_journey station1
+      journey.end_journey station2
+    end
+
+    it 'returns a hash of the journey upon journey end' do
+      expect(journey.this_journey).to include station1, station2
+    end
+
+  end
+
 end
