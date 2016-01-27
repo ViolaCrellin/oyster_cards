@@ -1,7 +1,7 @@
 require 'oystercard'
 require 'station'
 
-describe 'feature_test' do
+xdescribe 'feature_test' do
 
   it 'Tops up oystercard' do
     card = Oystercard.new
