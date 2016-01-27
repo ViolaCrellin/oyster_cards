@@ -58,6 +58,7 @@ end
   end
 
   describe '#this_journey' do
+    let(:this_journey) { {entry: station1, exit: station2}}
 
     before do
       journey.start_journey station1
@@ -65,7 +66,23 @@ end
     end
 
     it 'returns a hash of the journey upon journey end' do
-      expect(journey.this_journey).to include station1, station2
+      expect(journey.this_journey).to eq this_journey
+    end
+
+
+    describe '#fare' do
+
+      it {is_expected.to respond_to(:fare)}
+
+      it 'returns standard fare of 1 when #completed? is true' do
+        expect(journey.fare).to eq Journey::STANDARD_FARE
+      end
+
+      it 'returns penalty fare of 6 when #completed? is false' do
+        journey.start_journey station1
+        expect(journey.fare).to eq Journey::PENALTY_FARE
+      end
+
     end
 
   end
