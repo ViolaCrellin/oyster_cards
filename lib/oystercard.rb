@@ -21,6 +21,7 @@ class Oystercard
 
   def touch_in(station_in)
     fail "Please top up your Oystercard" if top_up_needed?
+    @this_journey = {}
     @station_in = station_in unless in_journey?
     this_journey[:entry] = station_in
   end
@@ -31,7 +32,6 @@ class Oystercard
     @station_in = nil
     this_journey[:exit] = station_out
     @journey_hist << this_journey
-    @this_journey = {}
   end
 
   def in_journey?

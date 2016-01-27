@@ -1,4 +1,5 @@
 require 'oystercard'
+require 'station'
 
 describe 'feature_test' do
 
@@ -14,34 +15,31 @@ describe 'feature_test' do
 
   it 'Stops you touching in if you don\'t have enough money on your card.' do
     card = Oystercard.new
-    station_in = :Peckham
     card.top_up 1
-    expect{card.touch_in(station_in)}.to raise_error("Please top up your Oystercard")
+    expect{card.touch_in(:Peckham)}.to raise_error("Please top up your Oystercard")
   end
 
   it 'deducts money from oystercard when touching out' do
     card = Oystercard.new
-    station_in = :Peckham
     card.top_up 20
-    card.touch_in(station_in)
-    card.touch_out
+    card.touch_in(:Peckham)
+    card.touch_out(:Aldgate)
     expect(card.balance).to eq 19
   end
 
   it 'lets you retrieve the name of the station you touched in at' do
     card = Oystercard.new
-    station_in = :Peckham
     card.top_up 20
-    card.touch_in(station_in)
-    expect(card.station_in).to eq station_in
+    card.touch_in(:Peckham)
+    expect(card.station_in).to eq :Peckham
   end
 
   it 'saves one journey history' do
     card = Oystercard.new
-    station_in = :Peckham
-    station_out = :Aldgate
-    card.touch_in(station_in)
-    card.touch_out(station_out)
-    expect()
+    card.top_up(10)
+    card.touch_in(:Peckham)
+    card.touch_out(:Aldgate)
+    expect(card.journey_hist).to include card.this_journey
+  end
 
 end
