@@ -4,6 +4,9 @@ class Journey
 
   attr_reader :this_journey, :exit_station, :entry_station
 
+  STANDARD_FARE = 1
+  PENALTY_FARE = 6
+
   def initialize
     @this_journey = {}
   end
@@ -20,7 +23,11 @@ class Journey
   end
 
   def completed?
-    !!entry_station && !!exit_station
+    !entry_station.nil? && !exit_station.nil?
+  end
+
+  def fare
+    completed? ? STANDARD_FARE : PENALTY_FARE
   end
 
 end
