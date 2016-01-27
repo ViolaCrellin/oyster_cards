@@ -16,16 +16,6 @@ describe Oystercard do
       expect(oystercard.balance).to eq Oystercard::DEFAULT_BALANCE
     end
 
-    it {is_expected.to respond_to(:in_journey?)}
-
-    it 'has an empty list of journeys by default' do
-      expect(oystercard.journey_hist).to eq []
-    end
-
-    it 'has an empty hash to save current journey' do
-      expect(oystercard.this_journey).to eq ({})
-    end
-
   end
 
   describe "#top_up" do
@@ -120,26 +110,27 @@ describe Oystercard do
     end
 
 
-    context "#touch_out will cause the entry station to be forgotten" do
+    context "#touch_out will save journey history and reset this_journey" do
+
+      let(:journey) { {entry: station_in, exit: station_out}}
 
       it "Returns nil for station_in when touched out" do
         oystercard.touch_out(station_out)
         expect(oystercard.station_in).to be_nil
       end
 
+      before do
+        oystercard.top_up 10
+        oystercard.touch_in(station_in)
+        oystercard.touch_out(station_out)
+      end
+
+      it 'saves one journey after touching in and out' do
+        expect(oystercard.journey_hist).to include journey
+      end
+
     end
 
   end
-
-  describe 'saving journey history' do
-    let(:journey) { {entry: station_in, exit: station_out}}
-    it 'saves one journey after touching in and out' do
-      oystercard.top_up 10
-      oystercard.touch_in(station_in)
-      oystercard.touch_out(station_out)
-      expect(oystercard.journey_hist).to include journey
-    end
-  end
-
 
 end
