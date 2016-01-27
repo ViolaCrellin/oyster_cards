@@ -16,6 +16,10 @@ describe Oystercard do
       expect(oystercard.balance).to eq Oystercard::DEFAULT_BALANCE
     end
 
+    it 'has an empty list of journeys by default' do
+      expect(oystercard.journey_hist).to eq []
+    end
+
   end
 
   describe "#top_up" do
