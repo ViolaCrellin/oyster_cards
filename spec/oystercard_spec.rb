@@ -9,6 +9,7 @@ describe Oystercard do
   let(:station_in) { double :station}
   let(:station_out) { double :station}
   let(:standard_fare) {1}
+  let(:penalty_fare)  {6}
 
   describe "#initialize" do
 
@@ -71,7 +72,7 @@ describe Oystercard do
 
   describe "#touch out" do
 
-    context "Changing card status to be not #in_journey?" do
+    context "Deducting fares on #touch out" do
 
       before do
         allow(dummy_journey).to receive(:new).and_return dummy_journey
@@ -79,16 +80,18 @@ describe Oystercard do
         allow(dummy_journey).to receive(:end_journey).with(station_out)
         allow(dummy_journey).to receive(:fare).and_return standard_fare
         allow(dummy_journey).to receive(:this_journey) {{entry: station_in, exit: station_out}}
-        oystercard.top_up(topup_amount)
-        oystercard.touch_in(station_in, dummy_journey)
+        oystercard.top_up 10
       end
 
 
       it "deducts fare when touched out" do
+        oystercard.touch_in(station_in, dummy_journey)
         expect {oystercard.touch_out(station_out)}.to change(oystercard, :balance).by(-standard_fare)
       end
 
-      it "deducts penalty"
+      it "deducts penalty when you don't touch out but have touched in" do
+        expect {oystercard.touch_out(station_out)}.to change(oystercard, :balance).by(-penalty_fare)
+      end
 
     end
 
