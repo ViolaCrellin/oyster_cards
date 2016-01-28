@@ -11,6 +11,7 @@ describe Oystercard do
   let(:standard_fare) {1}
   let(:penalty_fare)  {6}
 
+
   describe "#initialize" do
 
     it {is_expected.to respond_to(:balance)}
@@ -96,22 +97,48 @@ describe Oystercard do
     end
 
 
-    context "#touch_out will save journey history and reset this_journey" do
+    context "#touch_out will reset entry_station" do
 
-      let(:completed_journey) { {entry: station_in, exit: station_out}}
-
-
-      before do
+      it "returns nil for entry_station when touched out" do
         oystercard.top_up 10
         oystercard.touch_in(station_in)
         oystercard.touch_out(station_out)
-      end
-
-      it 'saves one journey after touching in and out to journey_hist' do
-        expect(oystercard.journey_hist).to include completed_journey
-      end
-
+        expect(oystercard.entry_station).to be nil
     end
 
   end
+end
+
+  describe "#journey_hist" do
+
+
+          let(:completed_journey) { {entry: station_in, exit: station_out}}
+          let(:in_only_journey) {{entry: station_in}}
+          let(:out_only_journey) {{exit: station_out}}
+
+
+          before do
+            oystercard.top_up 10
+          end
+
+          it 'saves one journey after touching in and out to journey_hist' do
+            oystercard.touch_in(station_in)
+            oystercard.touch_out(station_out)
+            expect(oystercard.journey_hist).to include completed_journey
+          end
+
+          it 'saves an incomplete journey when you touch in twice consecutively' do
+            oystercard.touch_in(station_in)
+            oystercard.touch_in(station_in)
+            expect(oystercard.journey_hist).to include in_only_journey
+          end
+
+          it 'saves an incomplete journey when you touch out twice consecutively' do
+            oystercard.touch_out(station_out)
+            oystercard.touch_out(station_out)
+            expect(oystercard.journey_hist).to include out_only_journey
+          end
+
+
+      end
 end
