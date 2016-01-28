@@ -37,10 +37,6 @@ class Oystercard
       @entry_station = nil
   end
 
-  # def in_journey?
-  #   !!station_in
-  # end
-
 private
 
   def max_balance?(amount)
