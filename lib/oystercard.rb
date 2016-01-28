@@ -8,9 +8,10 @@ class Oystercard
   PENALTY_FARE = 6
 
 
-  def initialize(balance=DEFAULT_BALANCE)
+  def initialize(journey_klass=Journey, balance=DEFAULT_BALANCE)
     @balance = balance
     @journey_hist = []
+    @journey_klass = journey_klass
   end
 
 
@@ -19,22 +20,24 @@ class Oystercard
     @balance += amount
   end
 
-  def touch_in(station_in, journey_klass=Journey)
+  def touch_in(station_in)
     fail "Please top up your Oystercard" if top_up_needed?
-    deduct(PENALTY_FARE) && @journey_hist << @current_trip.this_journey unless @entry_station.nil?
-
+    unless entry_station.nil?
+      deduct(PENALTY_FARE)
+      @journey_hist << current_trip.this_journey
+    end
     @entry_station = station_in
-    @current_trip = journey_klass.new
-    @current_trip.start_journey(station_in)
+    @current_trip = @journey_klass.new
+    current_trip.start_journey(station_in)
   end
 
-  def touch_out(station_out, journey_klass=Journey)
-    if @current_trip.nil?
-      @current_trip =journey_klass.new
+  def touch_out(station_out)
+    if entry_station.nil?
+      @current_trip = @journey_klass.new
     end
-      @current_trip.end_journey(station_out)
-      deduct(@current_trip.fare)
-      @journey_hist << @current_trip.this_journey
+      current_trip.end_journey(station_out)
+      deduct(current_trip.fare)
+      @journey_hist << current_trip.this_journey
       @entry_station = nil
   end
 

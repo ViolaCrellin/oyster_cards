@@ -61,7 +61,7 @@ describe Oystercard do
       subject(:poor_oystercard) {Oystercard.new(1)}
 
       it "Will raise error 'Please top up your Oystercard'" do
-        expect {poor_oystercard.touch_in(station_in, dummy_journey)}.to raise_error "Please top up your Oystercard"
+        expect {poor_oystercard.touch_in(station_in)}.to raise_error "Please top up your Oystercard"
       end
 
     end
@@ -79,18 +79,21 @@ describe Oystercard do
         allow(dummy_journey).to receive(:new).and_return dummy_journey
         allow(dummy_journey).to receive(:start_journey).with(station_in)
         allow(dummy_journey).to receive(:end_journey).with(station_out)
-        allow(dummy_journey).to receive(:fare).and_return standard_fare
-        allow(dummy_journey).to receive(:this_journey) {{entry: station_in, exit: station_out}}
         oystercard.top_up 10
+        oystercard.touch_in(station_in)
       end
 
 
-      it "deducts fare when touched out" do
-        oystercard.touch_in(station_in, dummy_journey)
-        expect {oystercard.touch_out(station_out)}.to change(oystercard, :balance).by(-standard_fare)
+      it "deducts standard fare when touched out and touched in" do
+        oystercard.touch_out(station_out)
+        allow(dummy_journey).to receive(:fare).and_return standard_fare
+        allow(dummy_journey).to receive(:completed?).and_return true
+        expect(oystercard.balance).to eq 9
       end
 
-      it "deducts penalty when you don't touch out but have touched in" do
+      it "deducts penalty when you don't touch in but have touched out" do
+        allow(dummy_journey).to receive(:completed?).and_return false
+        allow(dummy_journey).to receive(:fare).and_return penalty_fare
         expect {oystercard.touch_out(station_out)}.to change(oystercard, :balance).by(-penalty_fare)
       end
 
@@ -107,9 +110,9 @@ describe Oystercard do
     end
 
   end
-end
 
-  describe "#journey_hist" do
+
+    context "recording #journey_hist" do
 
 
           let(:completed_journey) { {entry: station_in, exit: station_out}}
@@ -140,5 +143,6 @@ end
           end
 
 
-      end
+    end
+  end
 end
