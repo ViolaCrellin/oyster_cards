@@ -27,11 +27,14 @@ class Oystercard
     @current_trip.start_journey(station_in)
   end
 
-  def touch_out(station_out)
-    deduct(current_trip.fare)
-    @current_trip.end_journey(station_out)
-    @journey_hist << @current_trip.this_journey
-    @entry_station = nil
+  def touch_out(station_out, journey_klass=Journey)
+    if @current_trip.nil?
+      @current_trip =journey_klass.new
+    end
+      @current_trip.end_journey(station_out)
+      deduct(@current_trip.fare)
+      @journey_hist << @current_trip.this_journey
+      @entry_station = nil
   end
 
   # def in_journey?
