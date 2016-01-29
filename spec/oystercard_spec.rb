@@ -143,9 +143,12 @@ end
             expect(oystercard.journey_hist).to include completed_journey
           end
 
-          it 'saves an incomplete journey when you touch in twice consecutively' do
+          before do
             allow(dummy_journey).to receive(:completed?).and_return false
             allow(dummy_journey).to receive(:fare).and_return penalty_fare
+          end
+
+          it 'saves an incomplete journey when you touch in twice consecutively' do
             allow(dummy_journey).to receive(:this_journey).and_return in_only_journey
             oystercard.touch_in(station_in)
             oystercard.touch_in(station_in)
@@ -153,8 +156,6 @@ end
           end
 
           it 'saves an incomplete journey when you touch out twice consecutively' do
-            allow(dummy_journey).to receive(:completed?).and_return false
-            allow(dummy_journey).to receive(:fare).and_return penalty_fare
             allow(dummy_journey).to receive(:this_journey).and_return out_only_journey
             oystercard.touch_out(station_out)
             oystercard.touch_out(station_out)
