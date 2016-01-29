@@ -2,7 +2,7 @@ require 'oystercard'
 require 'station'
 require 'journey'
 
-xdescribe 'feature_test' do
+describe 'feature_test' do
 
   it 'Tops up oystercard' do
     card = Oystercard.new
@@ -27,7 +27,7 @@ xdescribe 'feature_test' do
     card.top_up 20
     card.touch_in(station_in)
     card.touch_out(station_out)
-    expect(card.balance).to eq 19
+    expect(card.balance).to eq 18
   end
 
   it 'lets you retrieve the name of the station you touched in at' do
@@ -40,9 +40,11 @@ xdescribe 'feature_test' do
 
   it 'saves one journey history' do
     card = Oystercard.new
+    station_in = Station.new("Peckham", 2)
+    station_out = Station.new("Shoreditch", 1)
     card.top_up 20
-    card.touch_in "Peckham"
-    card.touch_out "Aldgate"
+    card.touch_in(station_in)
+    card.touch_out(station_out)
     expect(card.journey_hist).to include ({entry: "Peckham", exit: "Aldgate"})
   end
 
