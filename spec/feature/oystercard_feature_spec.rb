@@ -2,7 +2,7 @@ require 'oystercard'
 require 'station'
 require 'journey'
 
-describe 'feature_test' do
+xdescribe 'feature_test' do
 
   it 'Tops up oystercard' do
     card = Oystercard.new
@@ -22,17 +22,20 @@ describe 'feature_test' do
 
   it 'deducts money from oystercard when touching out' do
     card = Oystercard.new
+    station_in = Station.new(:Peckham, 2)
+    station_out = Station.new(:Aldgate, 1)
     card.top_up 20
-    card.touch_in(:Peckham)
-    card.touch_out(:Aldgate)
+    card.touch_in(station_in)
+    card.touch_out(station_out)
     expect(card.balance).to eq 19
   end
 
   it 'lets you retrieve the name of the station you touched in at' do
     card = Oystercard.new
+    station_in = Station.new(:Peckham, 2)
     card.top_up 20
-    card.touch_in("Peckham")
-    expect(card.entry_station).to eq "Peckham"
+    card.touch_in(station_in)
+    expect(card.entry_station).to eq station_in
   end
 
   it 'saves one journey history' do
@@ -79,6 +82,15 @@ describe 'feature_test' do
     card.touch_in "Peckham"
     card.touch_out "Shoreditch"
     expect(card.balance).to eq 19
+  end
+
+  it 'calaculates fare based on zones of stations' do
+    card = Oystercard.new
+    station_in = Station.new(:Peckham, 2)
+    station_out = Station.new(:Shoreditch, 1)
+    card.top_up 20
+    card.touch_in(station_in)
+    expect {oystercard.touch_out(station_out)}.to change(oystercard, :balance).by(station_in.zone - station_out.zone + 1)
   end
 
 

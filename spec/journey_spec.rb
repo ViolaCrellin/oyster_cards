@@ -75,33 +75,51 @@ end
     end
   end
 
-    describe '#fare' do
+  describe '#zone_fare' do
+    let(:random_zone1) {rand(1..5)}
+    let(:random_zone2) {rand(1..5)}
+
+    before do
+      allow(station1).to receive(:zone).and_return(random_zone1)
+      allow(station2).to receive(:zone).and_return(random_zone2)
+      journey.start_journey(station1)
+      journey.end_journey(station2)
+    end
+
+    it {is_expected.to respond_to(:zone_fare)}
+
+    it 'calculates fare based on station\'s zone' do
+      expect(journey.zone_fare).to eq ((random_zone1 - random_zone2).abs + 1)
+    end
+
+
+  describe '#fare' do
+    let(:this_journey) { {entry: station1, exit: station2}}
+
+    # before do
+    #   journey.start_journey station1
+    #   journey.end_journey station2
+    # end
+
+    it {is_expected.to respond_to(:fare)}
+
+    it 'returns standard fare of 1 when #completed? is true' do
+      expect(journey.fare).to eq journey.zone_fare
+    end
+  end
+end
+    context '#fare returns penalty fare' do
+
       let(:this_journey) { {entry: station1, exit: station2}}
 
       before do
         journey.start_journey station1
-        journey.end_journey station2
       end
 
-      it {is_expected.to respond_to(:fare)}
-
-      it 'returns standard fare of 1 when #completed? is true' do
-        expect(journey.fare).to eq Journey::STANDARD_FARE
+      it 'returns penalty fare of 6 when #completed? is false' do
+        journey.start_journey station1
+        expect(journey.fare).to eq Journey::PENALTY_FARE
       end
-  end
-
-
-  describe '#fare returns penalty fare' do
-    let(:this_journey) { {entry: station1, exit: station2}}
-
-    before do
-      journey.start_journey station1
     end
-
-    it 'returns penalty fare of 6 when #completed? is false' do
-      journey.start_journey station1
-      expect(journey.fare).to eq Journey::PENALTY_FARE
-    end
-  end
 
 end
