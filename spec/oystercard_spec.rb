@@ -3,9 +3,9 @@ require 'oystercard'
 describe Oystercard do
 
   #DOUBLES
-  let(:dummy_journey_klass) {double :dummy_journey_klass}
+  let(:dummy_journey_log) {double :dummy_journey_log}
   let(:dummy_journey) {double :dummy_journey}
-  subject(:oystercard) {described_class.new dummy_journey_klass}
+  subject(:oystercard) {described_class.new dummy_journey_log}
   let(:station_in) { double :station}
   let(:station_out) { double :station}
 
@@ -20,7 +20,7 @@ describe Oystercard do
 
 
 before do
-  allow(dummy_journey_klass).to receive(:new).and_return dummy_journey
+  allow(dummy_journey_log).to receive(:new).and_return dummy_journey
   allow(dummy_journey).to receive(:start_journey).with(station_in)
   allow(dummy_journey).to receive(:end_journey).with(station_out)
   allow(dummy_journey).to receive(:this_journey)
@@ -37,9 +37,9 @@ end
       expect(oystercard.balance).to eq Oystercard::DEFAULT_BALANCE
     end
 
-    it 'has an empty list of journeys by default' do
-      expect(oystercard.journey_hist).to eq []
-    end
+    # it 'has an empty list of journeys by default' do
+    #   expect(oystercard.journey_hist).to eq []
+    # end
 
   end
 
@@ -93,74 +93,87 @@ end
       oystercard.top_up topup_amount
     end
 
-      it "returns nil for entry_station when touched out" do
-        allow(dummy_journey).to receive(:fare).and_return standard_fare
-        oystercard.touch_in(station_in)
-        oystercard.touch_out(station_out)
-        expect(oystercard.entry_station).to be nil
-      end
+      # it "returns nil for entry_station when touched out" do
+      #   allow(dummy_journey).to receive(:fare).and_return standard_fare
+      #   oystercard.touch_in(station_in)
+      #   oystercard.touch_out(station_out)
+      #   expect(oystercard.entry_station).to be nil
+      # end
 
     context "Deducting fares on #touch out" do
 
+      before do
+        allow(dummy_journey_log).to receive(:start_journey).with(station_in)
+        allow(dummy_journey_log).to receive(:end_journey).with(station_out)
+      end
+
 
       it "deducts standard fare when touched out and touched in" do
-        allow(dummy_journey).to receive(:completed?).and_return true
-        allow(dummy_journey).to receive(:fare).and_return standard_fare
+
+        allow(dummy_journey_log).to receive(:completed?).and_return true
+        allow(dummy_journey_log).to receive(:fare).and_return standard_fare
         oystercard.touch_in(station_in)
         oystercard.touch_out(station_out)
         expect(oystercard.balance).to eq 9
       end
 
       it "deducts penalty when you don't touch in but have touched out" do
-        allow(dummy_journey).to receive(:completed?).and_return false
-        allow(dummy_journey).to receive(:fare).and_return penalty_fare
+        allow(dummy_journey_log).to receive(:completed?).and_return false
+        allow(dummy_journey_log).to receive(:fare).and_return penalty_fare
         expect {oystercard.touch_out(station_out)}.to change(oystercard, :balance).by(-penalty_fare)
       end
 
+
+
+
+    context "showing #journey_hist" do
+
+      it {is_expected.to respond_to(:show_journeys)}
+
+      it 'shows full journey history log'do
+        expect(dummy_journey_log).to receive(:history)
+        oystercard.show_journeys
+      end
     end
 
-
-
-
-    context "recording #journey_hist" do
-
-
-          let(:completed_journey) { {entry: station_in, exit: station_out}}
-          let(:in_only_journey) {{entry: station_in}}
-          let(:out_only_journey) {{exit: station_out}}
-
-
-          before do
-            oystercard.top_up topup_amount
-          end
-
-          it 'saves one journey after touching in and out to journey_hist' do
-            allow(dummy_journey).to receive(:completed?).and_return true
-            allow(dummy_journey).to receive(:fare).and_return standard_fare
-            allow(dummy_journey).to receive(:this_journey).and_return completed_journey
-            oystercard.touch_in(station_in)
-            oystercard.touch_out(station_out)
-            expect(oystercard.journey_hist).to include completed_journey
-          end
-
-          before do
-            allow(dummy_journey).to receive(:completed?).and_return false
-            allow(dummy_journey).to receive(:fare).and_return penalty_fare
-          end
-
-          it 'saves an incomplete journey when you touch in twice consecutively' do
-            allow(dummy_journey).to receive(:this_journey).and_return in_only_journey
-            oystercard.touch_in(station_in)
-            oystercard.touch_in(station_in)
-            expect(oystercard.journey_hist).to include in_only_journey
-          end
-
-          it 'saves an incomplete journey when you touch out twice consecutively' do
-            allow(dummy_journey).to receive(:this_journey).and_return out_only_journey
-            oystercard.touch_out(station_out)
-            oystercard.touch_out(station_out)
-            expect(oystercard.journey_hist).to include out_only_journey
-          end
+        #   let(:completed_journey) { {entry: station_in, exit: station_out}}
+        #   let(:in_only_journey) {{entry: station_in}}
+        #   let(:out_only_journey) {{exit: station_out}}
+        #
+        #
+        #   before do
+        #     oystercard.top_up topup_amount
+        #     allow(dummy_journey).to receive(:completed?).and_return true
+        #     allow(dummy_journey).to receive(:fare).and_return standard_fare
+        #   end
+        #
+        #   it 'saves one journey after touching in and out to journey_hist' do
+        #     allow(dummy_journey).to receive(:history).and_return completed_journey
+        #     oystercard.touch_in(station_in)
+        #     oystercard.touch_out(station_out)
+        #     expect(oystercard.journey_hist).to include completed_journey
+        #   end
+        #
+        #   before do
+        #     allow(dummy_journey).to receive(:completed?).and_return false
+        #     allow(dummy_journey).to receive(:fare).and_return penalty_fare
+        #   end
+        #
+        #   it 'saves an incomplete journey when you touch in twice consecutively' do
+        #     allow(dummy_journey).to receive(:this_journey).and_return in_only_journey
+        #     oystercard.touch_in(station_in)
+        #     oystercard.touch_in(station_in)
+        #     expect(oystercard.journey_hist).to include in_only_journey
+        #   end
+        #
+        #   it 'saves an incomplete journey when you touch out twice consecutively' do
+        #     allow(dummy_journey).to receive(:history).and_return out_only_journey
+        #     oystercard.touch_out(station_out)
+        #     oystercard.touch_out(station_out)
+        #     expect(oystercard.journey_hist).to include out_only_journey
+        #   end
+        #
+        # end
 
 
     end

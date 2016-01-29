@@ -2,7 +2,7 @@ require 'oystercard'
 require 'station'
 require 'journey'
 
-describe 'feature_test' do
+xdescribe 'feature_test' do
 
     let(:card) {Oystercard.new}
     let(:random_zone1) {rand(1..5)}

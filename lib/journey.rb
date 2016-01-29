@@ -7,17 +7,15 @@ class Journey
   STANDARD_FARE = 1
   PENALTY_FARE = 6
 
-  def initialize
+  def initialize(entry_station)
     @this_journey = {}
-  end
-
-  def start_journey(entry_station)
     @entry_station = entry_station
     @this_journey[:entry] = @entry_station.name
   end
 
 
-  def end_journey(exit_station)
+
+  def finish(exit_station)
     @exit_station = exit_station
     @this_journey[:exit] = @exit_station.name
   end

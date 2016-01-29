@@ -1,6 +1,6 @@
 class Oystercard
 
-  attr_reader :balance, :journey_hist, :current_trip, :entry_station
+  attr_reader :balance, :journey_hist, :current_trip, :entry_station #entry station won't be needed later
 
   DEFAULT_BALANCE = 0
   MAX_BALANCE = 90
@@ -8,10 +8,9 @@ class Oystercard
   PENALTY_FARE = 6
 
 
-  def initialize(journey_klass=Journey, balance=DEFAULT_BALANCE)
+  def initialize(journey_hist=JourneyLog.new, balance=DEFAULT_BALANCE)
     @balance = balance
-    @journey_hist = []
-    @journey_klass = journey_klass
+    @journey_hist = journey_hist
   end
 
 
@@ -20,25 +19,38 @@ class Oystercard
     @balance += amount
   end
 
+  def show_journeys
+    @journey_hist.history
+  end
+
   def touch_in(station_in)
     fail "Please top up your Oystercard" if top_up_needed?
-    unless entry_station.nil?
-      deduct(PENALTY_FARE)
-      @journey_hist << current_trip.this_journey
-    end
-    @current_trip = @journey_klass.new
-    current_trip.start_journey(station_in)
-    @entry_station = station_in
+    # unless entry_station.nil?
+      #OUTSOURCED later with edge cases
+      # deduct(PENALTY_FARE)
+      #OUTSOURCED TO LOG
+      # @journey_hist << current_trip.this_journey
+    # end
+    #OUTSOURCED to LOG
+    # @current_trip = @journey_klass.new
+
+    @journey_hist.start_journey(station_in)
+    #OUTSOURCED TO LOG
+    # @entry_station = station_in
   end
 
   def touch_out(station_out)
+    #OUSOURCED TO LOG
     if entry_station.nil?
-      @current_trip = @journey_klass.new
+      #OUTSOURCED TO LOG
+      # @current_trip = @journey_klass.new
     end
-      current_trip.end_journey(station_out)
-      deduct(current_trip.fare)
-      @journey_hist << current_trip.this_journey
-      @entry_station = nil
+      @journey_hist.end_journey(station_out)
+      deduct(@journey_hist.fare)
+      #OUTSOURCED to LOG
+      # @journey_hist << current_trip.this_journey
+      #OUTSOURCED TO LOG
+      # @entry_station = nil
   end
 
 
