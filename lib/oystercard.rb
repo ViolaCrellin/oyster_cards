@@ -1,3 +1,5 @@
+require_relative 'journey_log'
+
 class Oystercard
 
   attr_reader :balance, :journey_hist, :current_trip, :entry_station #entry station won't be needed later
@@ -25,32 +27,25 @@ class Oystercard
 
   def touch_in(station_in)
     fail "Please top up your Oystercard" if top_up_needed?
-    # unless entry_station.nil?
-      #OUTSOURCED later with edge cases
-      # deduct(PENALTY_FARE)
-      #OUTSOURCED TO LOG
-      # @journey_hist << current_trip.this_journey
-    # end
-    #OUTSOURCED to LOG
-    # @current_trip = @journey_klass.new
-
-    @journey_hist.start_journey(station_in)
-    #OUTSOURCED TO LOG
-    # @entry_station = station_in
+    if @journey_hist.trip.nil?
+      @journey_hist.start_journey(station_in)
+    else
+      touch_out(nil)
+      # deduct(@journey_hist.trip.fare)
+    end
   end
 
   def touch_out(station_out)
-    #OUSOURCED TO LOG
-    if entry_station.nil?
-      #OUTSOURCED TO LOG
-      # @current_trip = @journey_klass.new
-    end
+    if @journey_hist.trip.nil?
+      @journey_hist.start_journey
       @journey_hist.end_journey(station_out)
-      deduct(@journey_hist.fare)
-      #OUTSOURCED to LOG
-      # @journey_hist << current_trip.this_journey
-      #OUTSOURCED TO LOG
-      # @entry_station = nil
+      deduct(@journey_hist.outstanding_charges)
+      @journey_hist.reset
+    else
+      @journey_hist.end_journey(station_out)
+      deduct(@journey_hist.outstanding_charges)
+      @journey_hist.reset
+    end
   end
 
 
@@ -68,5 +63,10 @@ private
   def top_up_needed?
     @balance <= MINIMUM_BALANCE
   end
+
+  # def reimburse
+  #   amount = PENALTY_FARE - @journey_hist.outstanding_charges
+  #   @balance += amount
+  # end
 
 end

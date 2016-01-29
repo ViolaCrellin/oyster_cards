@@ -1,4 +1,4 @@
-
+require_relative 'journey'
 
 class JourneyLog
 
@@ -8,6 +8,7 @@ attr_reader :history, :trip
   def initialize(journey_klass=Journey)
     @journey_klass = journey_klass
     @history = []
+    @trip = nil
   end
 
   def journeys
@@ -15,12 +16,12 @@ attr_reader :history, :trip
   end
 
 
-  def start_journey(station_in)
+  def start_journey(station_in=nil)
     add_to_history(create_trip(station_in))
   end
 
 
-  def end_journey(station_out)
+  def end_journey(station_out=nil)
     @trip.finish(station_out)
   end
 
@@ -32,6 +33,10 @@ attr_reader :history, :trip
 
   def completed_trip?
     @trip.completed?
+  end
+
+  def reset
+    @trip = nil
   end
 
   def outstanding_charges

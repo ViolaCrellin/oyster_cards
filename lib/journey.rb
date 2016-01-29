@@ -1,27 +1,26 @@
-
+require_relative 'station'
 
 class Journey
 
   attr_reader :this_journey, :exit_station, :entry_station
 
-  STANDARD_FARE = 1
   PENALTY_FARE = 6
 
-  def initialize(entry_station)
+  def initialize(entry_station=nil)
     @this_journey = {}
     @entry_station = entry_station
-    @this_journey[:entry] = @entry_station.name
+    @this_journey[:entry] = @entry_station.name if !@entry_station.nil?
   end
 
 
 
-  def finish(exit_station)
+  def finish(exit_station=nil)
     @exit_station = exit_station
-    @this_journey[:exit] = @exit_station.name
+    @this_journey[:exit] = @exit_station.name if !@exit_station.nil?
   end
 
   def completed?
-    !entry_station.nil? && !exit_station.nil?
+    !this_journey[:entry].nil? && !this_journey[:exit].nil?
   end
 
   def zone_fare
