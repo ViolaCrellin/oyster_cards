@@ -32,10 +32,6 @@ describe Journey do
 
   describe "#end_journey" do
 
-    # before do
-    #   journey.start_journey station1
-    #   journey.end_journey station2
-    # end
 
     it {is_expected.to respond_to(:end_journey).with(1).argument}
 
