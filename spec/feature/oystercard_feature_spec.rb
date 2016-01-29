@@ -1,5 +1,6 @@
 require 'oystercard'
 require 'station'
+require 'journey'
 
 xdescribe 'feature_test' do
 

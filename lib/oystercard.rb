@@ -1,6 +1,6 @@
 class Oystercard
 
-  attr_reader :balance, :entry_station, :journey_hist, :this_journey, :current_trip
+  attr_reader :balance, :journey_hist, :current_trip, :entry_station
 
   DEFAULT_BALANCE = 0
   MAX_BALANCE = 90
@@ -26,9 +26,9 @@ class Oystercard
       deduct(PENALTY_FARE)
       @journey_hist << current_trip.this_journey
     end
-    @entry_station = station_in
     @current_trip = @journey_klass.new
     current_trip.start_journey(station_in)
+    @entry_station = station_in
   end
 
   def touch_out(station_out)
@@ -40,6 +40,8 @@ class Oystercard
       @journey_hist << current_trip.this_journey
       @entry_station = nil
   end
+
+
 
 private
 
